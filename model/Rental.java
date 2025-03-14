@@ -1,8 +1,10 @@
 package movies.model;
 
 public class Rental {
+    private int id;
     private final Movie movie;
     private final int daysRented;
+    private Customer customer;
 
     public Rental(Movie movie, int daysRented) {
         this.movie = movie;
@@ -23,5 +25,17 @@ public class Rental {
 
     public int calculateFrequentRenterPoints() {
         return movie.getPriceType().calculateFrequentRenterPoints(daysRented);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Customer {
+    private int id;
     private final String name;
     private final List<Rental> rentals = new ArrayList<>();
 
@@ -21,5 +22,9 @@ public class Customer {
 
     public List<Rental> getRentals() {
         return rentals;
+    }
+
+    public int getId(){
+        return id;
     }
 }
