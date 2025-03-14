@@ -2,24 +2,28 @@ package movies.utils;
 
 import movies.model.Customer;
 import movies.model.Rental;
+import movies.service.RentalStatementCalculator;
+
+import java.util.List;
 
 public class StatementGenerator {
     public static String generateStatement(Customer customer) {
-        double totalAmount = 0;
-        int frequentRenterPoints = 0;
-        StringBuilder result = new StringBuilder("Rental Record for " + customer.getName() + "\n");
+        RentalStatementCalculator calculator = new RentalStatementCalculator(customer);
+        calculator.calculate();
 
-        for (Rental rental : customer.getRentals()) {
-            double thisAmount = rental.calculateRentalAmount();
-            frequentRenterPoints += rental.calculateFrequentRenterPoints();
+        StringBuilder statement = new StringBuilder();
+        statement.append("Rental Record for ").append(customer.getName()).append("\n");
 
-            result.append("\t").append(rental.getMovie().getTitle()).append("\t").append(thisAmount).append("\n");
-            totalAmount += thisAmount;
+        List<Rental> rentals = customer.getRentals();
+        for (Rental rental : rentals) {
+            statement.append("\t").append(rental.getMovie().getTitle())
+                    .append("\t").append(rental.calculateRentalAmount()).append("\n");
         }
 
-        result.append("Amount owed is ").append(totalAmount).append("\n");
-        result.append("You earned ").append(frequentRenterPoints).append(" frequent renter points");
+        statement.append("Amount owed is ").append(calculator.getTotalAmount()).append("\n");
+        statement.append("You earned ").append(calculator.getFrequentRenterPoints())
+                .append(" frequent renter points");
 
-        return result.toString();
+        return statement.toString();
     }
 }
