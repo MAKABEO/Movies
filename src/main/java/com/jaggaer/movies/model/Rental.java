@@ -1,22 +1,34 @@
 package com.jaggaer.movies.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "rental")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class Rental {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private final Movie movie;
-    private final int daysRented;
+
+    private int daysRented;
+
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     public Rental(Movie movie, int daysRented) {
         this.movie = movie;
         this.daysRented = daysRented;
-    }
-
-    public int getDaysRented() {
-        return daysRented;
-    }
-
-    public Movie getMovie() {
-        return movie;
     }
 
     public double calculateRentalAmount() {
@@ -25,17 +37,5 @@ public class Rental {
 
     public int calculateFrequentRenterPoints() {
         return movie.getPriceType().calculateFrequentRenterPoints(daysRented);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
     }
 }

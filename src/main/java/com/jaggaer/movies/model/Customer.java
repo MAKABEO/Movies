@@ -1,12 +1,29 @@
 package com.jaggaer.movies.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Entity
+@Table(name = "customer")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class Customer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private final String name;
-    private final List<Rental> rentals = new ArrayList<>();
+    private String name;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Rental> rentals = new ArrayList<>();
 
     public Customer(String name) {
         this.name = name;
@@ -14,17 +31,6 @@ public class Customer {
 
     public void addRental(Rental rental) {
         rentals.add(rental);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<Rental> getRentals() {
-        return rentals;
-    }
-
-    public int getId(){
-        return id;
+        rental.setCustomer(this);
     }
 }
