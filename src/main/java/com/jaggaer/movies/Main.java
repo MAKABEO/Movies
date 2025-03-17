@@ -12,8 +12,6 @@ import com.jaggaer.movies.model.Rental;
 import com.jaggaer.movies.model.enums.MovieType;
 import com.jaggaer.movies.utils.StatementGenerator;
 
-import java.util.List;
-
 public class Main {
     public static void main(String[] args) {
         try {
