@@ -3,11 +3,13 @@ package com.jaggaer.movies.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "rental")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class Rental {
@@ -16,26 +18,19 @@ public class Rental {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int daysRented;
-
-    @ManyToOne
-    @JoinColumn(name = "movie_id")
-    private Movie movie;
+    @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RentalMovie> rentalMovies;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    public Rental(Movie movie, int daysRented) {
-        this.movie = movie;
-        this.daysRented = daysRented;
+    public Rental() {
+        this.rentalMovies = new ArrayList<>();
     }
 
-    public double calculateRentalAmount() {
-        return movie.getPriceType().calculateRentalAmount(daysRented);
-    }
-
-    public int calculateFrequentRenterPoints() {
-        return movie.getPriceType().calculateFrequentRenterPoints(daysRented);
+    public void addMovie(Movie movie, int daysRented) {
+        RentalMovie rentalMovie = new RentalMovie(this, movie, daysRented);
+        rentalMovies.add(rentalMovie);
     }
 }

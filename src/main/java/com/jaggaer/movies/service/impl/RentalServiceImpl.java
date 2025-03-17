@@ -20,13 +20,10 @@ public class RentalServiceImpl implements IRentalService {
 
     @Override
     public void registerRental(Customer customer, Rental rental) {
-        if (rental == null || rental.getDaysRented() < 1) {
-            throw new InvalidRentalDataException("Rental must have at least one day.");
-        }
-
         if (customer == null) {
             throw new InvalidCustomerDataException("Customer cannot be null.");
         }
+        validateRental(rental);
 
         rental.setCustomer(customer);
         customer.addRental(rental);
@@ -55,5 +52,18 @@ public class RentalServiceImpl implements IRentalService {
     @Override
     public void deleteRental(int id) {
         rentalDao.delete(id);
+    }
+
+    private void validateRental(Rental rental){
+        if (rental == null || rental.getRentalMovies().isEmpty()) {
+            throw new InvalidRentalDataException("You must rent at least one movie.");
+        }
+
+        rental.getRentalMovies().stream()
+                .filter(rm -> rm.getDaysRented() < 1)
+                .findFirst()
+                .ifPresent(rm -> {
+                    throw new InvalidRentalDataException("The movie '" + rm.getMovie().getTitle() + "' must be rented for at least one day.");
+                });
     }
 }
