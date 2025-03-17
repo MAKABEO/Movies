@@ -33,6 +33,14 @@ public class CustomerFacade {
         }
     }
 
+    public Customer getCustomerByName(String name) {
+        try {
+            return customerService.getCustomerByName(name);
+        } catch (CustomerNotFoundException e) {
+            throw new MovieRentalException("Customer not found: " + e.getMessage());
+        }
+    }
+
     public List<Customer> getAllCustomers() {
         return customerService.getAllCustomers();
     }

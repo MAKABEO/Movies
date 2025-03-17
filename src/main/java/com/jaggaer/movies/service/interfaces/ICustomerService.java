@@ -11,4 +11,5 @@ public interface ICustomerService {
     List<Customer> getAllCustomers();
     void updateCustomer(Customer customer);
     void deleteCustomer(int id);
+    Customer getCustomerByName(String name);
 }

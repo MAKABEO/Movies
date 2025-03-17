@@ -48,4 +48,13 @@ public class CustomerServiceImpl implements ICustomerService {
     public void deleteCustomer(int id) {
         customerDao.delete(id);
     }
+
+    @Override
+    public Customer getCustomerByName(String name) {
+        Customer customer = customerDao.findByName(name);
+        if (customer == null) {
+            throw new CustomerNotFoundException("Customer with name '" + name + "' not found.");
+        }
+        return customer;
+    }
 }
