@@ -2,9 +2,11 @@ package com.jaggaer.movies.dao.impl;
 
 
 import com.jaggaer.movies.dao.interfaces.IMovieDao;
+import com.jaggaer.movies.exceptions.MoviePersistenceException;
 import com.jaggaer.movies.model.Movie;
 import com.jaggaer.movies.utils.JPAUtil;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 
 import java.util.List;
 
@@ -18,9 +20,17 @@ public class MovieDaoImpl implements IMovieDao {
 
     @Override
     public void save(Movie movie) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(movie);
-        entityManager.getTransaction().commit();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.persist(movie);
+            entityManager.getTransaction().commit();
+        }
+        catch (PersistenceException | IllegalStateException e){
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw new MoviePersistenceException("Error saving movie: " + movie.getTitle(), e);
+        }
     }
 
     @Override
@@ -35,9 +45,16 @@ public class MovieDaoImpl implements IMovieDao {
 
     @Override
     public void update(Movie movie) {
-        entityManager.getTransaction().begin();
-        entityManager.merge(movie);
-        entityManager.getTransaction().commit();
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.merge(movie);
+            entityManager.getTransaction().commit();
+        } catch (PersistenceException | IllegalStateException e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw new MoviePersistenceException("Error updating movie: " + movie.getId(), e);
+        }
     }
 
     @Override

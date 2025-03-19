@@ -1,8 +1,7 @@
 package com.jaggaer.movies.facade;
 
-
-
 import com.jaggaer.movies.exceptions.CustomerNotFoundException;
+import com.jaggaer.movies.exceptions.CustomerPersistenceException;
 import com.jaggaer.movies.exceptions.InvalidCustomerDataException;
 import com.jaggaer.movies.exceptions.MovieRentalException;
 import com.jaggaer.movies.model.Customer;
@@ -20,7 +19,7 @@ public class CustomerFacade {
     public void registerCustomer(Customer customer) {
         try {
             customerService.registerCustomer(customer);
-        } catch (InvalidCustomerDataException e) {
+        } catch (InvalidCustomerDataException | CustomerPersistenceException e) {
             throw new MovieRentalException("Error registering customer: " + e.getMessage());
         }
     }
@@ -46,7 +45,11 @@ public class CustomerFacade {
     }
 
     public void updateCustomer(Customer customer) {
-        customerService.updateCustomer(customer);
+        try {
+            customerService.updateCustomer(customer);
+        } catch (CustomerPersistenceException e) {
+            throw new MovieRentalException("Error registering customer: " + e.getMessage());
+        }
     }
 
     public void deleteCustomer(int id) {

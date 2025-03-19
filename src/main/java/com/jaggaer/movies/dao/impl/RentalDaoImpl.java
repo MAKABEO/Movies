@@ -2,9 +2,11 @@ package com.jaggaer.movies.dao.impl;
 
 
 import com.jaggaer.movies.dao.interfaces.IRentalDao;
+import com.jaggaer.movies.exceptions.RentalPersistenceException;
 import com.jaggaer.movies.model.Rental;
 import com.jaggaer.movies.utils.JPAUtil;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 
 import java.util.List;
 
@@ -18,9 +20,17 @@ public class RentalDaoImpl implements IRentalDao {
 
     @Override
     public void save(Rental rental) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(rental);
-        entityManager.getTransaction().commit();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.persist(rental);
+            entityManager.getTransaction().commit();
+        }
+        catch (PersistenceException | IllegalStateException e){
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw new RentalPersistenceException("Error saving rental: " + rental.getId(), e);
+        }
     }
 
     @Override
@@ -35,9 +45,16 @@ public class RentalDaoImpl implements IRentalDao {
 
     @Override
     public void update(Rental rental) {
-        entityManager.getTransaction().begin();
-        entityManager.merge(rental);
-        entityManager.getTransaction().commit();
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.merge(rental);
+            entityManager.getTransaction().commit();
+        } catch (PersistenceException | IllegalStateException e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw new RentalPersistenceException("Error updating rental: " + rental.getId(), e);
+        }
     }
 
     @Override

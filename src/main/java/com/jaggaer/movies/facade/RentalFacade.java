@@ -1,10 +1,7 @@
 package com.jaggaer.movies.facade;
 
 
-import com.jaggaer.movies.exceptions.InvalidCustomerDataException;
-import com.jaggaer.movies.exceptions.InvalidRentalDataException;
-import com.jaggaer.movies.exceptions.MovieRentalException;
-import com.jaggaer.movies.exceptions.RentalNotFoundException;
+import com.jaggaer.movies.exceptions.*;
 import com.jaggaer.movies.model.Customer;
 import com.jaggaer.movies.model.Rental;
 import com.jaggaer.movies.service.interfaces.IRentalService;
@@ -22,7 +19,7 @@ public class RentalFacade {
     public void registerRental(Customer customer, Rental rental) {
         try {
             rentalService.registerRental(customer, rental);
-        } catch (InvalidRentalDataException | InvalidCustomerDataException e) {
+        } catch (InvalidRentalDataException | InvalidCustomerDataException | RentalPersistenceException e) {
             throw new MovieRentalException("Error registering rental: " + e.getMessage());
         }
     }
@@ -40,7 +37,11 @@ public class RentalFacade {
     }
 
     public void updateRental(Rental rental) {
-        rentalService.updateRental(rental);
+        try {
+            rentalService.updateRental(rental);
+        } catch (RentalPersistenceException e) {
+            throw new MovieRentalException("Error registering customer: " + e.getMessage());
+        }
     }
 
     public void deleteRental(int id) {

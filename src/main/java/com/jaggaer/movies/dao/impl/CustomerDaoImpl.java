@@ -1,10 +1,12 @@
 package com.jaggaer.movies.dao.impl;
 
 import com.jaggaer.movies.dao.interfaces.ICustomerDao;
+import com.jaggaer.movies.exceptions.CustomerPersistenceException;
 import com.jaggaer.movies.model.Customer;
 import com.jaggaer.movies.utils.JPAUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
@@ -19,9 +21,17 @@ public class CustomerDaoImpl implements ICustomerDao {
 
     @Override
     public void save(Customer customer) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(customer);
-        entityManager.getTransaction().commit();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.persist(customer);
+            entityManager.getTransaction().commit();
+        }
+        catch (PersistenceException | IllegalStateException e){
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw new CustomerPersistenceException("Error saving customer: " + customer.getName(), e);
+        }
     }
 
     @Override
@@ -36,9 +46,16 @@ public class CustomerDaoImpl implements ICustomerDao {
 
     @Override
     public void update(Customer customer) {
-        entityManager.getTransaction().begin();
-        entityManager.merge(customer);
-        entityManager.getTransaction().commit();
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.merge(customer);
+            entityManager.getTransaction().commit();
+        } catch (PersistenceException | IllegalStateException e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw new CustomerPersistenceException("Error updating customer: " + customer.getId(), e);
+        }
     }
 
     @Override

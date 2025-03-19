@@ -1,9 +1,7 @@
 package com.jaggaer.movies.facade;
 
 
-import com.jaggaer.movies.exceptions.InvalidMovieDataException;
-import com.jaggaer.movies.exceptions.MovieNotFoundException;
-import com.jaggaer.movies.exceptions.MovieRentalException;
+import com.jaggaer.movies.exceptions.*;
 import com.jaggaer.movies.model.Movie;
 import com.jaggaer.movies.service.interfaces.IMovieService;
 
@@ -19,7 +17,7 @@ public class MovieFacade {
     public void registerMovie(Movie movie) {
         try {
             movieService.registerMovie(movie);
-        } catch (InvalidMovieDataException e) {
+        } catch (InvalidMovieDataException | MoviePersistenceException e) {
             throw new MovieRentalException("Error registering movie: " + e.getMessage());
         }
     }
@@ -37,7 +35,11 @@ public class MovieFacade {
     }
 
     public void updateMovie(Movie movie) {
-        movieService.updateMovie(movie);
+        try {
+            movieService.updateMovie(movie);
+        } catch (MoviePersistenceException e) {
+            throw new MovieRentalException("Error registering customer: " + e.getMessage());
+        }
     }
 
     public void deleteMovie(int id) {
